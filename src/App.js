@@ -19,12 +19,9 @@ class BooksApp extends React.Component {
   }
 
   moveBookToShelf = (targetBook, newShelf) => {
-    BooksAPI.update(targetBook, newShelf).then((result) => {
-      this.setState((previousState) => {
-        const newState = previousState
-        const bookToMove = newState.books.filter(book => book.id === targetBook.id)
-        bookToMove[0].shelf = newShelf
-        return ({ books: newState.books})
+    BooksAPI.update(targetBook, newShelf).then(() => {
+      BooksAPI.getAll().then((books) => {
+      	this.setState({ books: books })
       })
     })
   }

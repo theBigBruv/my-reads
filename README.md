@@ -5,7 +5,7 @@ This is a simple React bookshelf app that allows you to select and categorize bo
 To get started developing right away:
 
 * install all project dependencies with `npm install`
-* install additional packages with `npm install --save escapeRegExp sortBy react-router-dom`
+* install additional packages with `npm install --save sortBy react-router-dom`
 * start the development server with `npm start`, after which you will be able to access the app on your browser via http://localhost:3000/
 
 

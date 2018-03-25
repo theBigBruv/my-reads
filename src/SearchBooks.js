@@ -1,37 +1,43 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import escapeRegExp from 'escape-string-regexp'
 import sortBy from 'sort-by'
+import * as BooksAPI from './BooksAPI'
 
 class SearchBooks extends Component {
 
   state = {
-    query: "",
+    booksFound: [],
   }
 
-  updateQuery = (query) => {
-    this.setState({ query: query })
+  findBooks = (query) => {
+    this.setState({ booksFound: [] })
+
+    BooksAPI.search(query).then(searchResults => {
+      this.setState({ booksFound: searchResults })
+    })
+
   }
 
-  clearQuery = () => {
-    this.setState({ query: "" })
+  setShelfValue = (book) => {
+    let myBooksIds
+    let bookShelfValue
+    myBooksIds = this.props.books.map(myBook => myBook.id)
+    if(myBooksIds.indexOf(book.id) > -1) {
+      bookShelfValue = this.props.books.filter(myBook => myBook.id === book.id)[0].shelf
+    }
+    else {
+      bookShelfValue = "none"
+    }
+    return bookShelfValue
   }
+
 
   render() {
 
-  const { books, onMoveBookToShelf } = this.props
-	const { query } = this.state
+  const { onMoveBookToShelf } = this.props
+	const { booksFound } = this.state
 
-	let showingBooks
-	if(query) {
-      const match = new RegExp(escapeRegExp(query), 'i')
-      showingBooks = books.filter((book) => match.test(book.title) || match.test(book.authors))
-  }
-	else {
-      showingBooks = books
-  }
-
-	showingBooks.sort(sortBy('title'))
+	booksFound.sort(sortBy('title'))
 
 	return (
       <div className="search-books">
@@ -41,22 +47,21 @@ class SearchBooks extends Component {
             <input
       		  type="text"
       		  placeholder="Search by title or author"
-      		  value={query}
-      		  onChange={(event) => this.updateQuery(event.target.value)}
+      		  onChange={(event) => this.findBooks(event.target.value)}
       		/>
           </div>
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-      		{showingBooks.map(book => (
+      		{booksFound.map(book => (
       		  <li key={book.id}>
                 <div className="book">
                   <div className="book-top">
-                    <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}>
+                    <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks ? book.imageLinks.thumbnail : ''})` }}>
                     </div>
                     <div className="book-shelf-changer">
                       <select
-                        value={book.shelf}
+                        value={this.setShelfValue(book)}
                         onChange={(event) =>
                           onMoveBookToShelf(book, event.target.value)
                       }>
@@ -69,7 +74,8 @@ class SearchBooks extends Component {
                     </div>
                   </div>
                   <div className="book-title">{book.title}</div>
-                  <div className="book-authors">{book.authors[0]}</div>
+                  <div className="book-authors">{book.authors}</div>
+                  <div className="book-authors">{book.shelf}</div>
                 </div>
               </li>
       		))}
