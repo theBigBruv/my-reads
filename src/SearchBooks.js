@@ -2,40 +2,38 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import sortBy from 'sort-by'
 import * as BooksAPI from './BooksAPI'
+import './App.css'
 
 class SearchBooks extends Component {
 
   state = {
-    booksFound: [],
+    booksFound: []
   }
 
   findBooks = (query) => {
+    const { books } = this.props
+
     this.setState({ booksFound: [] })
 
     BooksAPI.search(query).then(searchResults => {
-      this.setState({ booksFound: searchResults })
+      let myBooksIds
+      myBooksIds = books.map(myBook => myBook.id)
+      searchResults.forEach((book) => {
+        if(myBooksIds.indexOf(book.id) > -1) {
+          book.shelf = books.filter(myBook => myBook.id === book.id)[0].shelf
+        }
+        else {
+          book.shelf = "none"
+        }
+      })
+      this.setState((state) => ({ booksFound: searchResults }))
     })
-
   }
-
-  setShelfValue = (book) => {
-    let myBooksIds
-    let bookShelfValue
-    myBooksIds = this.props.books.map(myBook => myBook.id)
-    if(myBooksIds.indexOf(book.id) > -1) {
-      bookShelfValue = this.props.books.filter(myBook => myBook.id === book.id)[0].shelf
-    }
-    else {
-      bookShelfValue = "none"
-    }
-    return bookShelfValue
-  }
-
 
   render() {
 
-  const { onMoveBookToShelf } = this.props
 	const { booksFound } = this.state
+  const { onMoveBookToShelf } = this.props
 
 	booksFound.sort(sortBy('title'))
 
@@ -54,14 +52,14 @@ class SearchBooks extends Component {
         <div className="search-books-results">
           <ol className="books-grid">
       		{booksFound.map(book => (
-      		  <li key={book.id}>
+      		  <li key={book.id + book.title + booksFound.indexOf(book)}>
                 <div className="book">
                   <div className="book-top">
                     <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks ? book.imageLinks.thumbnail : ''})` }}>
                     </div>
                     <div className="book-shelf-changer">
                       <select
-                        value={this.setShelfValue(book)}
+                        value={book.shelf}
                         onChange={(event) =>
                           onMoveBookToShelf(book, event.target.value)
                       }>
@@ -75,7 +73,6 @@ class SearchBooks extends Component {
                   </div>
                   <div className="book-title">{book.title}</div>
                   <div className="book-authors">{book.authors}</div>
-                  <div className="book-authors">{book.shelf}</div>
                 </div>
               </li>
       		))}

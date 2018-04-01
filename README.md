@@ -23,6 +23,7 @@ To get started developing right away:
     ├── App.test.js # Used for testing. Provided with Create React App. Testing is encouraged, but not required.
     ├── MyReads.js # This is the home page component, which has the 3 shelves: Currently Reading, Want to Read, and Read
     ├── SearchBooks.js # This is the search page which contains all the available books
+    ├── Shelves.js # This is html component for each of the shelves
     ├── BooksAPI.js # A JavaScript API for the provided Udacity backend. Instructions for the methods are below.
     ├── icons # Helpful images for your app. Use at your discretion.
     │   ├── add.svg
